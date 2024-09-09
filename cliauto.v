@@ -9,7 +9,7 @@ pub fn command() cli.Command {
 		execute: fn (cmd cli.Command) ! {
 			line := cmd.args[0] or { ' ' }
 
-			for suggest in autocomplete(cmd, line) {
+			for suggest in autocomplete(cmd.parent, line) {
 				println(suggest)
 			}
 		}
@@ -21,14 +21,14 @@ pub fn command() cli.Command {
 	}
 }
 
-fn autocomplete(cmd cli.Command, line string) []string {
+pub fn autocomplete(cmd cli.Command, line string) []string {
 	mut suggestions := []string{}
 
 	raw_args := line.split(' ').filter(it.len > 0)
 	pos := if line.ends_with(' ') { raw_args.len } else { raw_args.len - 1 }
 
 	mut parent_flags := []cli.Flag{}
-	mut cmd_it := *cmd.parent
+	mut cmd_it := cmd
 	depth: for depth in 0 .. raw_args.len {
 		if pos == depth {
 			break depth
